@@ -849,10 +849,11 @@ erwork --depend=gimbal\startup_stm32f407xx.d -ogimbal\startup_stm32f407xx.o -I.
 ARM Macro Assembler    Page 14 
 
 
-./Inc -I.\RTE\_Gimbal -IE:\Softwares\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.17.1
-\Drivers\CMSIS\Device\ST\STM32F4xx\Include -IE:\Softwares\Keil_v5\ARM\CMSIS\Inc
-lude --predefine="__UVISION_VERSION SETA 524" --predefine="STM32F407xx SETA 1" 
---list=startup_stm32f407xx.lst startup_stm32f407xx.s
+./Inc -I.\RTE\_Gimbal -IE:\Softwares\Keil_v5\ARM\PACK\ARM\CMSIS\5.8.0\CMSIS\Cor
+e\Include -IE:\Softwares\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.17.1\Drivers\CMS
+IS\Device\ST\STM32F4xx\Include --predefine="__UVISION_VERSION SETA 524" --prede
+fine="_RTE_ SETA 1" --predefine="STM32F407xx SETA 1" --list=startup_stm32f407xx
+.lst startup_stm32f407xx.s
 
 
 
@@ -1956,4 +1957,4 @@ Symbol: __use_two_region_memory
       None
 Comment: __use_two_region_memory unused
 3 symbols
-447 symbols in table
+448 symbols in table

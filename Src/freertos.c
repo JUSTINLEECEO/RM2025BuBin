@@ -25,7 +25,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "INS_task.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -45,13 +45,26 @@
 
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN Variables */
-
+osThreadId motor_taskHandle;
+osThreadId communication_taskHandle;
+osThreadId INS_taskHandle;
+osThreadId led_taskHandle;
+osThreadId transmit_data_taskHandle;
+osThreadId transmit_data_taskHandle;
+osThreadId shoot_taskHandle;
+osThreadId rc_taskHandle;
 /* USER CODE END Variables */
 osThreadId testHandle;
-osThreadId motor_taskHandle;
+
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
 extern void motor_task(void const * argument);
+extern void communication_task(void const * argument);
+extern void led_task(void const * argument);
+extern void transmit_data_task(void const * argument);
+void start_INS_task(void const * argument);
+extern void shoot_task(void const * argument);
+extern void rc_task(void const * argument);
 /* USER CODE END FunctionPrototypes */
 
 void test_task(void const * argument);
@@ -122,10 +135,29 @@ void MX_FREERTOS_Init(void) {
   osThreadDef(test, test_task, osPriorityNormal, 0, 128);
   testHandle = osThreadCreate(osThread(test), NULL);
 
-	osThreadDef(motor, motor_task, osPriorityHigh, 0, 1024);
-  motor_taskHandle = osThreadCreate(osThread(motor), NULL);
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
+	osThreadDef(motor, motor_task, osPriorityHigh, 0, 512);
+	motor_taskHandle = osThreadCreate(osThread(motor), NULL);
+	
+	osThreadDef(communication, communication_task, osPriorityHigh, 0, 512);
+	communication_taskHandle = osThreadCreate(osThread(communication), NULL);
+	
+	osThreadDef(INS, start_INS_task, osPriorityNormal, 0, 512);
+	INS_taskHandle = osThreadCreate(osThread(INS), NULL);
+	
+//	osThreadDef(led, led_task, osPriorityLow, 0, 128);
+//	led_taskHandle = osThreadCreate(osThread(led), NULL);
+	
+	osThreadDef(transmit_data, transmit_data_task, osPriorityNormal, 0, 512);
+	transmit_data_taskHandle = osThreadCreate(osThread(transmit_data), NULL);
+	
+	osThreadDef(shoot, shoot_task, osPriorityHigh, 0, 512);
+	shoot_taskHandle = osThreadCreate(osThread(shoot), NULL);
+
+//	osThreadDef(rc, rc_task, osPriorityAboveNormal, 0, 128);
+//	rc_taskHandle = osThreadCreate(osThread(rc), NULL);
+
   /* USER CODE END RTOS_THREADS */
 
 }
@@ -144,7 +176,7 @@ __weak void test_task(void const * argument)
   /* USER CODE BEGIN test_task */
   /* Infinite loop */
   for(;;)
-  {
+  {;
     osDelay(1);
   }
   /* USER CODE END test_task */
@@ -152,5 +184,12 @@ __weak void test_task(void const * argument)
 
 /* Private application code --------------------------------------------------*/
 /* USER CODE BEGIN Application */
-
+void start_INS_task(void const * argurment)
+{
+	INS_Init();
+	while(1){
+		INS_task();
+		osDelay(1);
+	}
+}
 /* USER CODE END Application */

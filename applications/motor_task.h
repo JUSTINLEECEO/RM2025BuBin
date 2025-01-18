@@ -1,6 +1,6 @@
-#ifndef MOTOR_TASK_H
-#define MOTOR_TASK_H
+#ifndef __MOTOR_TASK_H
+#define __MOTOR_TASK_H
 
-void motor_task(void const * argument);
+void motor_task(void * argument);
 
 #endif

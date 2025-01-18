@@ -59,3 +59,12 @@ gimbal\freertos.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/timers.h
 gimbal\freertos.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/queue.h
 gimbal\freertos.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/semphr.h
 gimbal\freertos.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/event_groups.h
+gimbal\freertos.o: ../applications/INS_task.h
+gimbal\freertos.o: ../sources/BMI088driver.h
+gimbal\freertos.o: ../sources/QuaternionEKF.h
+gimbal\freertos.o: ../sources/kalman_filter.h
+gimbal\freertos.o: ../sources/arm_math.h
+gimbal\freertos.o: ../Drivers/CMSIS/Include/core_cm4.h
+gimbal\freertos.o: E:\Softwares\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
+gimbal\freertos.o: E:\Softwares\Keil_v5\ARM\ARMCC\Bin\..\include\math.h
+gimbal\freertos.o: E:\Softwares\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h

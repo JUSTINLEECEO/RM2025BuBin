@@ -24,11 +24,22 @@ static uint8_t gimbal_can_send_data[8];
 static CAN_TxHeaderTypeDef chassis_tx_message;
 static uint8_t chassis_can_send_data[8];
 
-int chassis1RawCircle = 0;
+int gimbal1RawCircle = 0, gimbalpitchRawCircle = 0, shootRawCircle = 0;
 
 CAN_RxHeaderTypeDef cboard_header;
 uint8_t cboard_data[8];
 extern int classic1_target_speed;
+	
+union
+{
+  uint8_t data[4];
+  float value;
+} float_union;
+
+union
+{
+  uint8_t data[8];
+}cboard_txmessage;
 
 /**
  * @brief          hal库CAN回调函数,接收电机数据
@@ -54,34 +65,52 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
   case CAN_TRIGGER_MOTOR_ID:
   {
     static uint8_t i = 0;
-    static int chassis1RawAngle = 0;
-    static uint8_t initFlag = 0;
+    static int gimbal1RawAngle = 0, gimbalpitchRawAngle = 0, shootRawAngle = 0;
+    static uint8_t yawinitFlag = 0, pitchinitflag = 0;
     // get motor id
     i = rx_header.StdId - CAN_3508_M1_ID;
 
     get_motor_measure(&motor_chassis[i], rx_data);
 
-    if (initFlag == 0)
+    if (yawinitFlag == 0)
     {
-      initFlag = 1;
+      yawinitFlag = 1;
     }
     else
     {
-      chassis1RawAngle = get_chassis_motor_measure_point(0)->ecd - get_chassis_motor_measure_point(0)->last_ecd;
-      if (chassis1RawAngle > 4096)
-        chassis1RawCircle--;
-      else if (chassis1RawAngle < -4096)
-        chassis1RawCircle++;
+      if (i == 4)
+      {
+        gimbal1RawAngle = get_yaw_gimbal_motor_measure_point()->ecd - get_yaw_gimbal_motor_measure_point()->last_ecd;
+        if (gimbal1RawAngle > 4096)
+          gimbal1RawCircle--;
+        else if (gimbal1RawAngle < -4096)
+          gimbal1RawCircle++;
+      }
+      else if (i == 5)
+      {
+        gimbalpitchRawAngle = get_pitch_gimbal_motor_measure_point()->ecd - get_pitch_gimbal_motor_measure_point()->last_ecd;
+        if (gimbalpitchRawAngle > 4096)
+          gimbalpitchRawCircle--;
+        else if (gimbalpitchRawAngle < -4096)
+          gimbalpitchRawCircle++;
+      }
+      else if (i == 6)
+      {
+        shootRawAngle = get_trigger_motor_measure_point()->ecd - get_trigger_motor_measure_point()->last_ecd;
+        if (shootRawAngle > 4096)
+          shootRawCircle--;
+        else if (shootRawAngle < -4096)
+          shootRawCircle++;
+      }
+      break;
     }
-
-    break;
-  }
 
   default:
   {
     cboard_header = rx_header;
     memcpy(cboard_data, rx_data, sizeof(rx_data));
     break;
+  }
   }
   }
 }
@@ -258,4 +287,40 @@ void CAN(void)
   motor31 = Pid_Caculate(motor_chassis[2].speed_rpm, -300); // 右轮3508电机
   motor41 = Pid_Caculate(motor_chassis[3].speed_rpm, 300);  // 左轮3508电机
   CAN_cmd_chassis(motor11, motor21, motor31, motor41);
+}
+
+void CAN_cmd_yaw(int16_t yaw)
+{
+    uint32_t send_mail_box;
+    gimbal_tx_message.StdId = CAN_GIMBAL_ALL_ID;
+    gimbal_tx_message.IDE = CAN_ID_STD;
+    gimbal_tx_message.RTR = CAN_RTR_DATA;
+    gimbal_tx_message.DLC = 0x08;
+    gimbal_can_send_data[0] = (yaw >> 8);
+    gimbal_can_send_data[1] = yaw;
+    gimbal_can_send_data[2] = 0;
+    gimbal_can_send_data[3] = 0;
+    gimbal_can_send_data[4] = 0;
+    gimbal_can_send_data[5] = 0;
+    gimbal_can_send_data[6] = 0;
+    gimbal_can_send_data[7] = 0;
+    HAL_CAN_AddTxMessage(&CHASSIS_CAN, &gimbal_tx_message, gimbal_can_send_data, &send_mail_box);
+}
+
+void CAN_cmd_shoot(int shoot)
+{
+  uint32_t send_mail_box;
+  gimbal_tx_message.StdId = CAN_GIMBAL_ALL_ID;
+  gimbal_tx_message.IDE = CAN_ID_STD;
+  gimbal_tx_message.RTR = CAN_RTR_DATA;
+  gimbal_tx_message.DLC = 0x08;
+  gimbal_can_send_data[0] = 0;
+  gimbal_can_send_data[1] = 0;
+  gimbal_can_send_data[2] = 0;
+  gimbal_can_send_data[3] = 0;
+  gimbal_can_send_data[4] = (shoot >> 8);
+  gimbal_can_send_data[5] = shoot;
+  gimbal_can_send_data[6] = 0;
+  gimbal_can_send_data[7] = 0;
+  HAL_CAN_AddTxMessage(&hcan1, &gimbal_tx_message, gimbal_can_send_data, &send_mail_box);
 }

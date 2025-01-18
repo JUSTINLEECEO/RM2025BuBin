@@ -1,4 +1,3 @@
-
 #ifndef CAN_RECEIVE_H
 #define CAN_RECEIVE_H
 
@@ -48,5 +47,9 @@ extern const motor_measure_t *get_trigger_motor_measure_point(void);
 extern const motor_measure_t *get_chassis_motor_measure_point(uint8_t i);
 
 void CAN_Tansmit(CAN_HandleTypeDef *hcan, uint32_t StdId, uint8_t *pData, uint8_t Length);
+
+void CAN_cmd_yaw(int16_t yaw);
+
+void CAN_cmd_shoot(int shoot);
 
 #endif

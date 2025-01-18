@@ -76,3 +76,8 @@ gimbal\main.o: E:\Softwares\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
 gimbal\main.o: E:\Softwares\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
 gimbal\main.o: E:\Softwares\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
 gimbal\main.o: ../Inc/gpio.h
+gimbal\main.o: ../applications/remote_control.h
+gimbal\main.o: ../applications/struct_typedef.h
+gimbal\main.o: ../boards/bsp_rc.h
+gimbal\main.o: ../applications/pid.h
+gimbal\main.o: ../boards/bsp_can.h

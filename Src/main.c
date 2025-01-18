@@ -34,7 +34,10 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "remote_control.h"
+#include "struct_typedef.h"
+#include "pid.h"
+#include "bsp_can.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -49,25 +52,54 @@
 
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
-
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-
+char rxmessage[BUFFERSIZE] = {0};
+uint8_t remoteMessage[36] = {0};
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 void MX_FREERTOS_Init(void);
 /* USER CODE BEGIN PFP */
+//void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size)
+//{
+////    HAL_GPIO_WritePin(LED_B_GPIO_Port, LED_B_Pin, GPIO_PIN_SET);
+//    if (huart == &huart6)
+//    {
+//					HAL_GPIO_WritePin(LED_R_GPIO_Port, LED_R_Pin, GPIO_PIN_SET);
+////        float Kp, Ki, Kd;
+////        sscanf(rxmessage, "%f,%f,%f", &Kp, &Ki, &Kd);
+////        for (int i = 0; i < 4; i++)
+////        {
+////            Motor_SPID[i].PID_reset(&Motor_SPID, Kp, Ki, Kd);
+////        }
 
+////        memset(rxmessage, 0, BUFFERSIZE);
+//        HAL_UARTEx_ReceiveToIdle_DMA(&huart6, (char *)rxmessage, BUFFERSIZE);
+//    }
+//    else if (huart->Instance == USART3)
+//    {
+//				HAL_GPIO_WritePin(LED_G_GPIO_Port, LED_G_Pin, GPIO_PIN_SET);
+//        remoteReceive(remoteMessage);
+//        HAL_UARTEx_ReceiveToIdle_DMA(&huart3, (uint8_t *)remoteMessage, 36);
+//    }
+//}
+//void USART3_IRQHandler(void)
+//{
+//	HAL_GPIO_TogglePin(LED_B_GPIO_Port, LED_B_Pin);
+//}
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+PID_TypeDef Motor_VPID[4] = {0};
+PID_TypeDef Motor_SPID = {0};
+PID_TypeDef Gimbal_VPID = {0};
+PID_TypeDef Gimbal_SPID = {0};
 /* USER CODE END 0 */
 
 /**
@@ -122,7 +154,10 @@ int main(void)
   MX_USART1_UART_Init();
   MX_USART6_UART_Init();
   /* USER CODE BEGIN 2 */
-
+//  HAL_UARTEx_ReceiveToIdle_DMA(&huart3, (uint8_t *)remoteMessage, 36);
+//	can_filter_init();
+//  HAL_TIM_Base_Start_IT(&htim4);
+  HAL_Delay(10);
   /* USER CODE END 2 */
 
   /* Call init function for freertos objects (in cmsis_os2.c) */
@@ -138,9 +173,11 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-
+//		HAL_GPIO_TogglePin(LED_R_GPIO_Port, LED_R_Pin);
+		
     /* USER CODE BEGIN 3 */
   }
+	  HAL_UARTEx_ReceiveToIdle_DMA(&huart3, (uint8_t *)remoteMessage, 36);
   /* USER CODE END 3 */
 }
 
@@ -192,6 +229,27 @@ void SystemClock_Config(void)
 /* USER CODE BEGIN 4 */
 
 /* USER CODE END 4 */
+
+/**
+  * @brief  Period elapsed callback in non blocking mode
+  * @note   This function is called  when TIM14 interrupt took place, inside
+  * HAL_TIM_IRQHandler(). It makes a direct call to HAL_IncTick() to increment
+  * a global variable "uwTick" used as application time base.
+  * @param  htim : TIM handle
+  * @retval None
+  */
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+  /* USER CODE BEGIN Callback 0 */
+
+  /* USER CODE END Callback 0 */
+  if (htim->Instance == TIM14) {
+    HAL_IncTick();
+  }
+  /* USER CODE BEGIN Callback 1 */
+
+  /* USER CODE END Callback 1 */
+}
 
 /**
   * @brief  This function is executed in case of error occurrence.
